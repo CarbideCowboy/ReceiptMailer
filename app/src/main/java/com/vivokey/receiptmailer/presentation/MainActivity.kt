@@ -1,9 +1,11 @@
 package com.vivokey.receiptmailer.presentation
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -22,6 +24,14 @@ import com.vivokey.receiptmailer.presentation.email_builder.components.Attachmen
 class MainActivity : ComponentActivity() {
 
     private val viewModel: BuildEmailViewModel by viewModels()
+
+    var resultUri: Uri? = null
+
+    val chooseImageResult = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
+        if(isSuccess) {
+            println("testing")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +58,6 @@ class MainActivity : ComponentActivity() {
     }
 
     fun GetAttachments() {
-        var intent = Intent()
-        intent.type = "image/*"
-        intent.action = Intent.ACTION_GET_CONTENT
-        val getContent = registerForActivityResult(Intent.createChooser(intent, "Select Attachment"), viewModel.updateAttachments(data))
+        chooseImageResult.launch(resultUri)
     }
 }
