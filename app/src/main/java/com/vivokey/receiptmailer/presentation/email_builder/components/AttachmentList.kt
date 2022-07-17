@@ -31,14 +31,6 @@ fun AttachmentList(viewModel: BuildEmailViewModel = hiltViewModel()) {
 
     var tempUri: Uri? = null
 
-    val takePicture = context.findActivity()?.registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
-        if(isSuccess) {
-            tempUri?.let { uri ->
-                println(uri)
-            }
-        }
-    }
-
     FlowRow(
         mainAxisSpacing = 10.dp,
         crossAxisSpacing = 10.dp,
@@ -53,10 +45,7 @@ fun AttachmentList(viewModel: BuildEmailViewModel = hiltViewModel()) {
                 .clip(RoundedCornerShape(10.dp))
                 .background(Color.Red)
                 .clickable{
-                    getTempFileUri(context).let { uri ->
-                        tempUri = uri
-                        takePicture?.launch(uri)
-                    }
+                    viewModel.shouldShowCamera.value = true
                 }
         )
     }
@@ -66,13 +55,4 @@ fun Context.findActivity(): AppCompatActivity? = when(this) {
     is AppCompatActivity -> this
     is ContextWrapper -> baseContext.findActivity()
     else -> null
-}
-
-fun getTempFileUri(context: Context): Uri {
-    val tempFile = File.createTempFile("temp_image_file", ".png", context.cacheDir).apply {
-        createNewFile()
-        deleteOnExit()
-    }
-
-    return FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", tempFile)
 }
