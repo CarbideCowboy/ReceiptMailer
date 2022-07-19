@@ -2,7 +2,6 @@ package com.vivokey.receiptmailer.presentation.email_builder
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.media.Image
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.camera.core.ImageCapture
@@ -28,7 +27,7 @@ class BuildEmailViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
-    var images: List<Image> by mutableStateOf(emptyList())
+    var images: List<Uri> by mutableStateOf(emptyList())
     var recipient: String? by mutableStateOf(sharedPreferences.getString(context.getString(R.string.preference_recipient), ""))
     var subject: String? by mutableStateOf(sharedPreferences.getString(context.getString(R.string.preference_subject), ""))
 
@@ -52,12 +51,9 @@ class BuildEmailViewModel @Inject constructor(
         sharedPreferences.edit().putString(context.getString(R.string.preference_subject), value).apply()
     }
 
-    fun updateAttachments(context: Context, value: List<Image>) {
-        images = value
-    }
-
-    fun handleImageCapture(uri: Uri) {
+    private fun handleImageCapture(uri: Uri) {
         shouldShowCamera.value = false
+        images = images + uri
     }
 
     private fun getOutputDirectory(context: Context): File {
@@ -77,7 +73,6 @@ class BuildEmailViewModel @Inject constructor(
         imageCapture: ImageCapture,
         outputDirectory: File,
         executor: Executor,
-        onImageCaptured: (Uri) -> Unit,
         onError: (ImageCaptureException) -> Unit
     ) {
         takePictureUseCase.takePhoto(
@@ -85,7 +80,7 @@ class BuildEmailViewModel @Inject constructor(
             imageCapture,
             outputDirectory,
             executor,
-            onImageCaptured,
+            ::handleImageCapture,
             onError
         )
     }

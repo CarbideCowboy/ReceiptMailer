@@ -23,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.vivokey.receiptmailer.presentation.email_builder.BuildEmailViewModel
 import com.vivokey.receiptmailer.presentation.email_builder.components.AttachmentList
 import com.vivokey.receiptmailer.presentation.email_builder.components.CameraView
+import org.intellij.lang.annotations.JdkConstants
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -61,7 +62,6 @@ class MainActivity : ComponentActivity() {
                         CameraView(
                             outputDirectory = viewModel.outputDirectory,
                             executor = viewModel.cameraExecutor,
-                            onImageCaptured = viewModel::handleImageCapture,
                             onError = { println("View Error $it")}
                         )
                     }
@@ -85,6 +85,15 @@ class MainActivity : ComponentActivity() {
             ) -> println("Show permission dialog")
 
             else -> requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+        }
+    }
+
+    override fun onBackPressed() {
+        if(viewModel.shouldShowCamera.value) {
+            viewModel.shouldShowCamera.value = false
+        }
+        else {
+            super.onBackPressed()
         }
     }
 

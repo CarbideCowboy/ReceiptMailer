@@ -41,7 +41,6 @@ fun CameraView(
     viewModel: BuildEmailViewModel = hiltViewModel(),
     outputDirectory: File,
     executor: Executor,
-    onImageCaptured: (Uri) -> Unit,
     onError: (ImageCaptureException) -> Unit
     ) {
 
@@ -78,7 +77,6 @@ fun CameraView(
                 imageCapture = imageCapture,
                 outputDirectory = outputDirectory,
                 executor = executor,
-                onImageCaptured = onImageCaptured,
                 onError = onError
             )
         },
