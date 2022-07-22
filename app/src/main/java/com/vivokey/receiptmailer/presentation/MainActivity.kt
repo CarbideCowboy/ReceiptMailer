@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -59,7 +60,7 @@ class MainActivity : ComponentActivity() {
                                 ).show()
                             }
                         }) {
-                            Icon(Icons.Filled.Add, "")
+                            Icon(Icons.Filled.Send, "")
                         }
                     }
                 }) {
