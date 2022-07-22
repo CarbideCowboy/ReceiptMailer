@@ -32,6 +32,7 @@ class BuildEmailViewModel @Inject constructor(
     var images: List<Uri> by mutableStateOf(emptyList())
     var recipient: String? by mutableStateOf(sharedPreferences.getString(context.getString(R.string.preference_recipient), ""))
     var subject: String? by mutableStateOf(sharedPreferences.getString(context.getString(R.string.preference_subject), ""))
+    var body: String? by mutableStateOf(sharedPreferences.getString(context.getString(R.string.preference_body), ""))
 
     var outputDirectory: File
     var cameraExecutor: ExecutorService
@@ -51,6 +52,11 @@ class BuildEmailViewModel @Inject constructor(
     fun updateSubject(context: Context, value: String) {
         subject = value
         sharedPreferences.edit().putString(context.getString(R.string.preference_subject), value).apply()
+    }
+
+    fun updateBody(context: Context, value: String) {
+        body = value
+        sharedPreferences.edit().putString(context.getString(R.string.preference_body), value).apply()
     }
 
     private fun handleImageCapture(uri: Uri) {
@@ -84,10 +90,7 @@ class BuildEmailViewModel @Inject constructor(
         )
     }
 
-    fun getEmailIntent(): Intent? {
-        if(recipient != null && subject != null) {
-            return buildEmailUseCase.buildEmail(recipient!!, subject!!, images)
-        }
-        return null
+    fun getEmailIntent(): Intent {
+        return buildEmailUseCase.buildEmail(recipient!!, subject, body, images)
     }
 }

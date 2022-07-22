@@ -49,32 +49,25 @@ class MainActivity : ComponentActivity() {
                 Scaffold(floatingActionButton = {
                     if(!viewModel.shouldShowCamera.value) {
                         FloatingActionButton(onClick = {
-                            val intent = viewModel.getEmailIntent()
-                            try {
-                                startActivity(Intent.createChooser(intent, "Send mail..."))
-                            } catch (exception: ActivityNotFoundException) {
-                                Toast.makeText(
-                                    this,
-                                    "There are no email clients installed",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                            onSendEmailPressed()
                         }) {
                             Icon(Icons.Filled.Send, "")
                         }
                     }
                 }) {
-                    Surface(color = MaterialTheme.colors.background) {
+                    Surface(
+                        modifier = Modifier.padding(top = 32.dp),
+                        color = MaterialTheme.colors.background) {
                         Column(
                             modifier = Modifier
                                 .padding(it)
                                 .fillMaxWidth()
                                 .fillMaxHeight(),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                            verticalArrangement = Arrangement.spacedBy(32.dp)
                         ) {
-                            Text(text = "Enter email recipient:")
                             TextField(
+                                label = { Text("Enter recipient email") },
                                 value = viewModel.recipient ?: "",
                                 onValueChange = {
                                     viewModel.updateRecipient(
@@ -82,10 +75,15 @@ class MainActivity : ComponentActivity() {
                                         it
                                     )
                                 })
-                            Text(text = "Enter subject line:")
                             TextField(
+                                label = { Text("Enter subject line (optional)") },
                                 value = viewModel.subject ?: "",
                                 onValueChange = { viewModel.updateSubject(applicationContext, it) })
+                            TextField(
+                                label = { Text("Enter body text (optional)") },
+                                maxLines = 5,
+                                value = viewModel.body ?: "",
+                                onValueChange = { viewModel.updateBody(applicationContext, it) })
                             AttachmentList()
                         }
 
@@ -125,6 +123,28 @@ class MainActivity : ComponentActivity() {
             ) -> println("Show permission dialog")
 
             else -> requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+        }
+    }
+
+    private fun onSendEmailPressed() {
+        if(viewModel.recipient != "") {
+            val intent = viewModel.getEmailIntent()
+            try {
+                startActivity(Intent.createChooser(intent, "Send mail..."))
+            } catch (exception: ActivityNotFoundException) {
+                Toast.makeText(
+                    this,
+                    "There are no email clients installed",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+        else {
+            Toast.makeText(
+                this,
+                "Please specify an email address for your recipient",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

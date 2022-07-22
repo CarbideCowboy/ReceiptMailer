@@ -36,8 +36,6 @@ fun AttachmentList(viewModel: BuildEmailViewModel = hiltViewModel()) {
 
     val context = LocalContext.current
 
-    var tempUri: Uri? = null
-
     FlowRow(
         mainAxisSpacing = 10.dp,
         crossAxisSpacing = 10.dp,

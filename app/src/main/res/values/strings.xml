@@ -2,5 +2,6 @@
     <string name="app_name">ReceiptMailer</string>
     <string name="preference_recipient">PREFERENCE_RECIPIENT</string>
     <string name="preference_subject">PREFERENCE_SUBJECT</string>
+    <string name="preference_body">PREFERENCE_BODY</string>
     <string name="preference_key">d0450dae21e643ef9564a460c34680ac</string>
 </resources>
