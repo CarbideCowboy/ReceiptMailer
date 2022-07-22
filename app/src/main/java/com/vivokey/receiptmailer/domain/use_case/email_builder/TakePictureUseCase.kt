@@ -4,19 +4,17 @@ import android.content.Context
 import android.net.Uri
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executor
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class TakePictureUseCase @Inject constructor(){
 
     fun takePhoto(
+        context: Context,
         filenameFormat: String,
         imageCapture: ImageCapture,
         outputDirectory: File,
@@ -39,7 +37,7 @@ class TakePictureUseCase @Inject constructor(){
             }
 
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                val savedUri = Uri.fromFile(photoFile)
+                val savedUri = FileProvider.getUriForFile(context, context.applicationContext.packageName + ".provider", photoFile)
                 onImageCaptured(savedUri)
             }
         })

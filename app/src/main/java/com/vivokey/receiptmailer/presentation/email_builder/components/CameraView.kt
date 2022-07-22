@@ -38,6 +38,7 @@ import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun CameraView(
+    context: Context,
     viewModel: BuildEmailViewModel = hiltViewModel(),
     outputDirectory: File,
     executor: Executor,
@@ -73,6 +74,7 @@ fun CameraView(
         
         IconButton(onClick = {
             viewModel.takePhoto(
+                context,
                 filenameFormat = "yyyy-MM-dd-HH-mm-ss-SSS",
                 imageCapture = imageCapture,
                 outputDirectory = outputDirectory,

@@ -1,18 +1,20 @@
 package com.vivokey.receiptmailer.presentation
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,7 +25,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.vivokey.receiptmailer.presentation.email_builder.BuildEmailViewModel
 import com.vivokey.receiptmailer.presentation.email_builder.components.AttachmentList
 import com.vivokey.receiptmailer.presentation.email_builder.components.CameraView
-import org.intellij.lang.annotations.JdkConstants
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -40,33 +41,71 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         requestCameraPermission()
+        requestSharedStoragePermission()
 
         setContent {
             ReceiptMailerTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Text(text = "Enter email recipient:")
-                        TextField(value = viewModel.recipient ?: "", onValueChange = {viewModel.updateRecipient(applicationContext, it)})
-                        Text(text = "Enter subject line:")
-                        TextField(value = viewModel.subject ?: "", onValueChange = {viewModel.updateSubject(applicationContext, it)})
-                        AttachmentList()
+                Scaffold(floatingActionButton = {
+                    if(!viewModel.shouldShowCamera.value) {
+                        FloatingActionButton(onClick = {
+                            val intent = viewModel.getEmailIntent()
+                            try {
+                                startActivity(Intent.createChooser(intent, "Send mail..."))
+                            } catch (exception: ActivityNotFoundException) {
+                                Toast.makeText(
+                                    this,
+                                    "There are no email clients installed",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }) {
+                            Icon(Icons.Filled.Add, "")
+                        }
                     }
-                    if(viewModel.shouldShowCamera.value) {
-                        CameraView(
-                            outputDirectory = viewModel.outputDirectory,
-                            executor = viewModel.cameraExecutor,
-                            onError = { println("View Error $it")}
-                        )
+                }) {
+                    Surface(color = MaterialTheme.colors.background) {
+                        Column(
+                            modifier = Modifier
+                                .padding(it)
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Text(text = "Enter email recipient:")
+                            TextField(
+                                value = viewModel.recipient ?: "",
+                                onValueChange = {
+                                    viewModel.updateRecipient(
+                                        applicationContext,
+                                        it
+                                    )
+                                })
+                            Text(text = "Enter subject line:")
+                            TextField(
+                                value = viewModel.subject ?: "",
+                                onValueChange = { viewModel.updateSubject(applicationContext, it) })
+                            AttachmentList()
+                        }
+
+                        if (viewModel.shouldShowCamera.value) {
+                            CameraView(
+                                this,
+                                outputDirectory = viewModel.outputDirectory,
+                                executor = viewModel.cameraExecutor,
+                                onError = { println("View Error $it") }
+                            )
+                        }
                     }
                 }
             }
+        }
+    }
+
+    private fun requestSharedStoragePermission() {
+        if(!Environment.isExternalStorageManager()) {
+            val intent = Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+            startActivity(intent)
         }
     }
 

@@ -1,8 +1,10 @@
 package com.vivokey.receiptmailer.presentation.email_builder
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import android.os.Environment
 import android.provider.MediaStore
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -57,18 +59,14 @@ class BuildEmailViewModel @Inject constructor(
     }
 
     private fun getOutputDirectory(context: Context): File {
-        val mediaDir = MediaStore.getExternalVolumeNames(context).toTypedArray()[0]?.let {
+        val dir = Environment.getExternalStorageDirectory().absolutePath.let {
             File(it, context.resources.getString(R.string.app_name)).apply { mkdirs() }
         }
-
-        if (mediaDir != null && mediaDir.exists()) {
-            return mediaDir
-        }
-
-        return context.filesDir
+        return dir
     }
 
     fun takePhoto(
+        context: Context,
         filenameFormat: String,
         imageCapture: ImageCapture,
         outputDirectory: File,
@@ -76,6 +74,7 @@ class BuildEmailViewModel @Inject constructor(
         onError: (ImageCaptureException) -> Unit
     ) {
         takePictureUseCase.takePhoto(
+            context,
             filenameFormat,
             imageCapture,
             outputDirectory,
@@ -83,5 +82,12 @@ class BuildEmailViewModel @Inject constructor(
             ::handleImageCapture,
             onError
         )
+    }
+
+    fun getEmailIntent(): Intent? {
+        if(recipient != null && subject != null) {
+            return buildEmailUseCase.buildEmail(recipient!!, subject!!, images)
+        }
+        return null
     }
 }
