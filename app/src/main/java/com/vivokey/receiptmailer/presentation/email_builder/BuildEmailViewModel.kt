@@ -37,7 +37,7 @@ class BuildEmailViewModel @Inject constructor(
     var outputDirectory: File
     var cameraExecutor: ExecutorService
 
-    var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
+    var shouldShowCameraFullScreen: MutableState<Boolean> = mutableStateOf(false)
 
     init {
         outputDirectory = getOutputDirectory(context)
@@ -60,7 +60,6 @@ class BuildEmailViewModel @Inject constructor(
     }
 
     private fun handleImageCapture(uri: Uri) {
-        shouldShowCamera.value = false
         images = images + uri
     }
 

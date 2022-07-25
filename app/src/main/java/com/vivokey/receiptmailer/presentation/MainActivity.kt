@@ -11,13 +11,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -47,16 +51,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             ReceiptMailerTheme {
                 Scaffold(floatingActionButton = {
-                    if(!viewModel.shouldShowCamera.value) {
-                        FloatingActionButton(onClick = {
-                            onSendEmailPressed()
-                        }) {
-                            Icon(Icons.Filled.Send, "")
-                        }
+                    FloatingActionButton(onClick = {
+                        onSendEmailPressed()
+                    }) {
+                        Icon(Icons.Filled.Send, "")
                     }
                 }) {
                     Surface(
-                        modifier = Modifier.padding(top = 32.dp),
                         color = MaterialTheme.colors.background) {
                         Column(
                             modifier = Modifier
@@ -64,32 +65,67 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .fillMaxHeight(),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(32.dp)
                         ) {
-                            TextField(
-                                label = { Text("Enter recipient email") },
-                                value = viewModel.recipient ?: "",
-                                onValueChange = {
-                                    viewModel.updateRecipient(
-                                        applicationContext,
-                                        it
-                                    )
-                                })
-                            TextField(
-                                label = { Text("Enter subject line (optional)") },
-                                value = viewModel.subject ?: "",
-                                onValueChange = { viewModel.updateSubject(applicationContext, it) })
-                            TextField(
-                                label = { Text("Enter body text (optional)") },
-                                maxLines = 5,
-                                value = viewModel.body ?: "",
-                                onValueChange = { viewModel.updateBody(applicationContext, it) })
-                            AttachmentList()
-                        }
-
-                        if (viewModel.shouldShowCamera.value) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(32.dp)
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                TextField(
+                                    label = { Text("Enter recipient email") },
+                                    value = viewModel.recipient ?: "",
+                                    onValueChange = {
+                                        viewModel.updateRecipient(
+                                            applicationContext,
+                                            it
+                                        )
+                                    })
+                                TextField(
+                                    label = { Text("Enter subject line (optional)") },
+                                    value = viewModel.subject ?: "",
+                                    onValueChange = {
+                                        viewModel.updateSubject(
+                                            applicationContext,
+                                            it
+                                        )
+                                    })
+                                TextField(
+                                    label = { Text("Enter body text (optional)") },
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .padding(bottom = 16.dp),
+                                    value = viewModel.body ?: "",
+                                    onValueChange = {
+                                        viewModel.updateBody(
+                                            applicationContext,
+                                            it
+                                        )
+                                    })
+                            }
                             CameraView(
-                                this,
+                                modifier =
+                                    if(!viewModel.shouldShowCameraFullScreen.value) {
+                                        Modifier
+                                            .animateContentSize()
+                                            .weight(1f)
+                                            .width(200.dp)
+                                            .padding(bottom = 8.dp)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .clickable {
+                                                viewModel.shouldShowCameraFullScreen.value =
+                                                    !viewModel.shouldShowCameraFullScreen.value
+                                            }
+                                    } else {
+                                        Modifier
+                                            .animateContentSize()
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                viewModel.shouldShowCameraFullScreen.value =
+                                                    !viewModel.shouldShowCameraFullScreen.value
+                                            }
+                                    },
                                 outputDirectory = viewModel.outputDirectory,
                                 executor = viewModel.cameraExecutor,
                                 onError = { println("View Error $it") }
@@ -149,12 +185,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onBackPressed() {
-        if(viewModel.shouldShowCamera.value) {
-            viewModel.shouldShowCamera.value = false
-        }
-        else {
-            super.onBackPressed()
-        }
+        super.onBackPressed()
     }
 
     override fun onDestroy() {

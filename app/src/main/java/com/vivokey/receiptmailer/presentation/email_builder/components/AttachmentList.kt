@@ -34,8 +34,6 @@ import java.io.File
 @Composable
 fun AttachmentList(viewModel: BuildEmailViewModel = hiltViewModel()) {
 
-    val context = LocalContext.current
-
     FlowRow(
         mainAxisSpacing = 10.dp,
         crossAxisSpacing = 10.dp,
@@ -52,16 +50,9 @@ fun AttachmentList(viewModel: BuildEmailViewModel = hiltViewModel()) {
                 .clip(RoundedCornerShape(10.dp))
                 .background(Color.Gray)
                 .clickable{
-                    viewModel.shouldShowCamera.value = true
                 }
         ) {
             Icon(Icons.Filled.Add, "", modifier = Modifier.size(128.dp))
         }
     }
-}
-
-fun Context.findActivity(): AppCompatActivity? = when(this) {
-    is AppCompatActivity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
 }

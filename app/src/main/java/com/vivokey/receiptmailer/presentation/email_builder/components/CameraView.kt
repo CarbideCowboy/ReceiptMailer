@@ -38,7 +38,7 @@ import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun CameraView(
-    context: Context,
+    modifier: Modifier,
     viewModel: BuildEmailViewModel = hiltViewModel(),
     outputDirectory: File,
     executor: Executor,
@@ -69,12 +69,12 @@ fun CameraView(
         preview.setSurfaceProvider(previewView.surfaceProvider)
     }
 
-    Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()) {
+    Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.fillMaxSize()) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
         
         IconButton(onClick = {
             viewModel.takePhoto(
-                context,
+                context = context,
                 filenameFormat = "yyyy-MM-dd-HH-mm-ss-SSS",
                 imageCapture = imageCapture,
                 outputDirectory = outputDirectory,
