@@ -12,24 +12,28 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.vivokey.receiptmailer.ui.theme.ReceiptMailerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import com.vivokey.receiptmailer.presentation.email_builder.BuildEmailViewModel
-import com.vivokey.receiptmailer.presentation.email_builder.components.AttachmentList
 import com.vivokey.receiptmailer.presentation.email_builder.components.CameraView
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -48,15 +52,17 @@ class MainActivity : ComponentActivity() {
         requestCameraPermission()
         requestSharedStoragePermission()
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                if(viewModel.shouldStartIntent.value) {
+                    onSendEmailPressed()
+                }
+            }
+        }
+
         setContent {
             ReceiptMailerTheme {
-                Scaffold(floatingActionButton = {
-                    FloatingActionButton(onClick = {
-                        onSendEmailPressed()
-                    }) {
-                        Icon(Icons.Filled.Send, "")
-                    }
-                }) {
+                Scaffold(modifier = Modifier.padding(0.dp)) {
                     Surface(
                         color = MaterialTheme.colors.background) {
                         Column(
@@ -68,7 +74,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             Column(
                                 modifier = Modifier
-                                    .padding(32.dp)
+                                    .padding(bottom = 32.dp, top = 32.dp)
                                     .weight(1f)
                                     .fillMaxHeight(),
                                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -96,17 +102,15 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .fillMaxHeight()
                                         .padding(bottom = 16.dp),
-                                    value = viewModel.body ?: "",
+                                    value = viewModel.body,
                                     onValueChange = {
-                                        viewModel.updateBody(
-                                            applicationContext,
-                                            it
-                                        )
+                                        viewModel.body = it
                                     })
                             }
-                            CameraView(
-                                modifier =
-                                    if(!viewModel.shouldShowCameraFullScreen.value) {
+                            if(viewModel.image == null) {
+                                CameraView(
+                                    modifier =
+                                    if (!viewModel.shouldShowCameraFullScreen.value) {
                                         Modifier
                                             .animateContentSize()
                                             .weight(1f)
@@ -126,10 +130,20 @@ class MainActivity : ComponentActivity() {
                                                     !viewModel.shouldShowCameraFullScreen.value
                                             }
                                     },
-                                outputDirectory = viewModel.outputDirectory,
-                                executor = viewModel.cameraExecutor,
-                                onError = { println("View Error $it") }
-                            )
+                                    outputDirectory = viewModel.outputDirectory,
+                                    executor = viewModel.cameraExecutor,
+                                    onError = { println("View Error $it") },
+                                )
+                            }
+                            if(viewModel.image != null) {
+                                onSendEmailPressed()
+                                Image(
+                                    painter = rememberAsyncImagePainter(model = viewModel.image),
+                                    contentDescription = "",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.FillHeight
+                                )
+                            }
                         }
                     }
                 }
@@ -184,12 +198,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         viewModel.cameraExecutor.shutdown()
+    }
+
+    override fun onBackPressed() {
+        viewModel.image = null
     }
 }

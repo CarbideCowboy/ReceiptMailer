@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Environment
-import android.provider.MediaStore
+import android.os.IBinder
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.compose.runtime.*
@@ -29,15 +29,16 @@ class BuildEmailViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
-    var images: List<Uri> by mutableStateOf(emptyList())
+    var image: Uri? by mutableStateOf(null)
     var recipient: String? by mutableStateOf(sharedPreferences.getString(context.getString(R.string.preference_recipient), ""))
     var subject: String? by mutableStateOf(sharedPreferences.getString(context.getString(R.string.preference_subject), ""))
-    var body: String? by mutableStateOf(sharedPreferences.getString(context.getString(R.string.preference_body), ""))
+    var body: String by mutableStateOf("")
 
     var outputDirectory: File
     var cameraExecutor: ExecutorService
 
     var shouldShowCameraFullScreen: MutableState<Boolean> = mutableStateOf(false)
+    var shouldStartIntent: MutableState<Boolean> = mutableStateOf(false)
 
     init {
         outputDirectory = getOutputDirectory(context)
@@ -54,13 +55,9 @@ class BuildEmailViewModel @Inject constructor(
         sharedPreferences.edit().putString(context.getString(R.string.preference_subject), value).apply()
     }
 
-    fun updateBody(context: Context, value: String) {
-        body = value
-        sharedPreferences.edit().putString(context.getString(R.string.preference_body), value).apply()
-    }
-
     private fun handleImageCapture(uri: Uri) {
-        images = images + uri
+        image = uri
+        shouldStartIntent.value = true
     }
 
     private fun getOutputDirectory(context: Context): File {
@@ -90,6 +87,6 @@ class BuildEmailViewModel @Inject constructor(
     }
 
     fun getEmailIntent(): Intent {
-        return buildEmailUseCase.buildEmail(recipient!!, subject, body, images)
+        return buildEmailUseCase.buildEmail(recipient!!, subject, body, image!!)
     }
 }

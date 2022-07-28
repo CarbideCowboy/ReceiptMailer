@@ -41,9 +41,11 @@ fun AttachmentList(viewModel: BuildEmailViewModel = hiltViewModel()) {
             .fillMaxWidth()
             .padding(32.dp),
     ) {
+        /*
         viewModel.images.forEach { image ->
             Attachment(image)
         }
+         */
         Box(
             modifier = Modifier
                 .size(100.dp)

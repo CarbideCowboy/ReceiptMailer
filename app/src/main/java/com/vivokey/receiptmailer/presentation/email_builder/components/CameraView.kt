@@ -1,7 +1,6 @@
 package com.vivokey.receiptmailer.presentation.email_builder.components
 
 import android.content.Context
-import android.net.Uri
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -31,6 +30,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vivokey.receiptmailer.presentation.email_builder.BuildEmailViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
 import java.io.File
 import java.util.concurrent.Executor
 import kotlin.coroutines.resume
