@@ -52,14 +52,6 @@ class MainActivity : ComponentActivity() {
         requestCameraPermission()
         requestSharedStoragePermission()
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                if(viewModel.shouldStartIntent.value) {
-                    onSendEmailPressed()
-                }
-            }
-        }
-
         setContent {
             ReceiptMailerTheme {
                 Scaffold(modifier = Modifier.padding(0.dp)) {
