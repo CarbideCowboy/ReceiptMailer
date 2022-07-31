@@ -31,7 +31,7 @@ class BuildEmailViewModel @Inject constructor(
 
     var image: Uri? by mutableStateOf(null)
     var recipient: String? by mutableStateOf(sharedPreferences.getString(context.getString(R.string.preference_recipient), ""))
-    var subject: String? by mutableStateOf(sharedPreferences.getString(context.getString(R.string.preference_subject), ""))
+    var subject: String by mutableStateOf("Receipt")
     var body: String by mutableStateOf("")
 
     var outputDirectory: File
@@ -48,11 +48,6 @@ class BuildEmailViewModel @Inject constructor(
     fun updateRecipient(context: Context, value: String) {
         recipient = value
         sharedPreferences.edit().putString(context.getString(R.string.preference_recipient), value).apply()
-    }
-
-    fun updateSubject(context: Context, value: String) {
-        subject = value
-        sharedPreferences.edit().putString(context.getString(R.string.preference_subject), value).apply()
     }
 
     private fun handleImageCapture(uri: Uri) {

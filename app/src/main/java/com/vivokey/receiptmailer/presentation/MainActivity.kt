@@ -14,13 +14,20 @@ import androidx.activity.viewModels
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -53,8 +60,14 @@ class MainActivity : ComponentActivity() {
         requestSharedStoragePermission()
 
         setContent {
+            val focusManager = LocalFocusManager.current
+            val interactionSource = remember { MutableInteractionSource() }
             ReceiptMailerTheme {
-                Scaffold(modifier = Modifier.padding(0.dp)) {
+                Scaffold(modifier = Modifier
+                    .padding(0.dp)
+                    .clickable(interactionSource = interactionSource, indication = null){
+                        focusManager.clearFocus()
+                    }) {
                     Surface(
                         color = MaterialTheme.colors.background) {
                         Column(
@@ -66,12 +79,16 @@ class MainActivity : ComponentActivity() {
                         ) {
                             Column(
                                 modifier = Modifier
-                                    .padding(bottom = 32.dp, top = 32.dp)
+                                    .padding(bottom = 32.dp, top = 32.dp, start = 16.dp, end = 16.dp)
                                     .weight(1f)
-                                    .fillMaxHeight(),
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(),
                                 verticalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 TextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(0.dp, 74.dp),
                                     label = { Text("Enter recipient email") },
                                     value = viewModel.recipient ?: "",
                                     onValueChange = {
@@ -81,23 +98,43 @@ class MainActivity : ComponentActivity() {
                                         )
                                     })
                                 TextField(
+                                    modifier = Modifier.fillMaxWidth(),
                                     label = { Text("Enter subject line (optional)") },
-                                    value = viewModel.subject ?: "",
+                                    value = viewModel.subject,
                                     onValueChange = {
-                                        viewModel.updateSubject(
-                                            applicationContext,
-                                            it
-                                        )
+                                        viewModel.subject = it
                                     })
+                                val bodyLabel = remember { mutableStateOf("Describe what business expense this receipt is for and who you were with. For example, if it is a lunch receipt, explain it is for lunch with XXXX to discuss YYYY.") }
                                 TextField(
-                                    label = { Text("Enter body text (optional)") },
+                                    label = { Text(bodyLabel.value) },
                                     modifier = Modifier
                                         .fillMaxHeight()
-                                        .padding(bottom = 16.dp),
+                                        .fillMaxWidth()
+                                        .padding(bottom = 16.dp)
+                                        .onFocusChanged { focusState ->
+                                            when {
+                                                focusState.isFocused ->
+                                                    bodyLabel.value = "Enter body text (optional)"
+                                                !focusState.isFocused && viewModel.body.isEmpty() ->
+                                                    bodyLabel.value = "Describe what business expense this receipt is for and who you were with. For example, if it is a lunch receipt, explain it is for lunch with XXXX to discuss YYYY."
+                                            }
+                                        },
                                     value = viewModel.body,
                                     onValueChange = {
                                         viewModel.body = it
+                                    },
+                                    trailingIcon = {
+                                        if(viewModel.body.isNotEmpty()) {
+                                            Icon(
+                                                Icons.Default.Clear,
+                                                contentDescription = "clear text",
+                                                modifier = Modifier.clickable{
+                                                    viewModel.body = ""
+                                                }
+                                            )
+                                        }
                                     })
+
                             }
                             if(viewModel.image == null) {
                                 CameraView(
@@ -110,6 +147,7 @@ class MainActivity : ComponentActivity() {
                                             .padding(bottom = 8.dp)
                                             .clip(RoundedCornerShape(10.dp))
                                             .clickable {
+                                                focusManager.clearFocus()
                                                 viewModel.shouldShowCameraFullScreen.value =
                                                     !viewModel.shouldShowCameraFullScreen.value
                                             }
@@ -169,7 +207,14 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun onSendEmailPressed() {
-        if(viewModel.recipient != "") {
+
+        if(viewModel.recipient.isNullOrEmpty()) {
+            Toast.makeText(
+                this,
+                "Please specify an email address for your recipient",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
             val intent = viewModel.getEmailIntent()
             try {
                 startActivity(Intent.createChooser(intent, "Send mail..."))
@@ -181,13 +226,6 @@ class MainActivity : ComponentActivity() {
                 ).show()
             }
         }
-        else {
-            Toast.makeText(
-                this,
-                "Please specify an email address for your recipient",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
     }
 
     override fun onDestroy() {
@@ -196,6 +234,14 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onBackPressed() {
-        viewModel.image = null
+        if(viewModel.image != null) {
+            viewModel.image = null
+            return
+        }
+        if(viewModel.shouldShowCameraFullScreen.value) {
+            viewModel.shouldShowCameraFullScreen.value = false
+        } else {
+            super.onBackPressed()
+        }
     }
 }
