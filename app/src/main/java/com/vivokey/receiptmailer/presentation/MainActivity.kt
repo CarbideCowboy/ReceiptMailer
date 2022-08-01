@@ -31,16 +31,11 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.vivokey.receiptmailer.ui.theme.ReceiptMailerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import com.vivokey.receiptmailer.presentation.email_builder.BuildEmailViewModel
 import com.vivokey.receiptmailer.presentation.email_builder.components.CameraView
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -160,8 +155,6 @@ class MainActivity : ComponentActivity() {
                                                     !viewModel.shouldShowCameraFullScreen.value
                                             }
                                     },
-                                    outputDirectory = viewModel.outputDirectory,
-                                    executor = viewModel.cameraExecutor,
                                     onError = { println("View Error $it") },
                                 )
                             }

@@ -40,8 +40,6 @@ import kotlin.coroutines.suspendCoroutine
 fun CameraView(
     modifier: Modifier,
     viewModel: BuildEmailViewModel = hiltViewModel(),
-    outputDirectory: File,
-    executor: Executor,
     onError: (ImageCaptureException) -> Unit
     ) {
 
@@ -77,8 +75,6 @@ fun CameraView(
                 context = context,
                 filenameFormat = "yyyy-MM-dd-HH-mm-ss-SSS",
                 imageCapture = imageCapture,
-                outputDirectory = outputDirectory,
-                executor = executor,
                 onError = onError
             )
         },
