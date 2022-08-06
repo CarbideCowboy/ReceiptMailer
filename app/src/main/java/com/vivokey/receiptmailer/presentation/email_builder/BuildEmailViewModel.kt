@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import com.vivokey.receiptmailer.R
 import com.vivokey.receiptmailer.domain.use_case.email_builder.BuildEmailUseCase
+import com.vivokey.receiptmailer.domain.use_case.email_builder.PurgeImageFilesUseCase
 import com.vivokey.receiptmailer.domain.use_case.email_builder.TakePictureUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,6 +23,7 @@ class BuildEmailViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val buildEmailUseCase: BuildEmailUseCase,
     private val takePictureUseCase: TakePictureUseCase,
+    private val purgeImageFilesUseCase: PurgeImageFilesUseCase,
     private val sharedPreferences: SharedPreferences,
     private val outputDirectory: File,
     val cameraExecutor: ExecutorService,

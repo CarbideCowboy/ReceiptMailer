@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.sharp.Clear
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -77,7 +78,18 @@ class MainActivity : ComponentActivity() {
                             .clickable(interactionSource = interactionSource, indication = null) {
                                 focusManager.clearFocus()
                             },
-                        backgroundColor = Color.Transparent
+                        backgroundColor = Color.Transparent,
+                        floatingActionButton = {
+                            FloatingActionButton(onClick = {
+                                /*TODO*/
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Sharp.Clear,
+                                    contentDescription = "Erase previous image files from device",
+                                    tint = Color.White,
+                                )
+                            }
+                        }
                     ) {
                         Surface(
                             color = Color.Transparent
