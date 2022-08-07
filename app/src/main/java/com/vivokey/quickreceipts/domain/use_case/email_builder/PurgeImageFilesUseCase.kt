@@ -1,4 +1,4 @@
-package com.vivokey.receiptmailer.domain.use_case.email_builder
+package com.vivokey.quickreceipts.domain.use_case.email_builder
 
 import java.io.File
 import javax.inject.Inject

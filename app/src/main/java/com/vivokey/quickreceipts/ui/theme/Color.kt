@@ -1,4 +1,4 @@
-package com.vivokey.receiptmailer.ui.theme
+package com.vivokey.quickreceipts.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package com.vivokey.receiptmailer.presentation.email_builder
+package com.vivokey.quickreceipts.presentation.email_builder
 
 import android.content.Context
 import android.content.Intent
@@ -8,15 +8,15 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
-import com.vivokey.receiptmailer.R
-import com.vivokey.receiptmailer.domain.use_case.email_builder.BuildEmailUseCase
-import com.vivokey.receiptmailer.domain.use_case.email_builder.PurgeImageFilesUseCase
-import com.vivokey.receiptmailer.domain.use_case.email_builder.TakePictureUseCase
+import com.vivokey.quickreceipts.domain.use_case.email_builder.BuildEmailUseCase
+import com.vivokey.quickreceipts.domain.use_case.email_builder.PurgeImageFilesUseCase
+import com.vivokey.quickreceipts.domain.use_case.email_builder.TakePictureUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
+import com.vivokey.quickreceipts.R
 
 @HiltViewModel
 class BuildEmailViewModel @Inject constructor(
@@ -36,6 +36,7 @@ class BuildEmailViewModel @Inject constructor(
 
     var shouldShowCameraFullScreen: MutableState<Boolean> = mutableStateOf(false)
     var shouldStartIntent: MutableState<Boolean> = mutableStateOf(false)
+    var showPurgeFileDialog: MutableState<Boolean> = mutableStateOf(false)
 
     fun updateRecipient(context: Context, value: String) {
         recipient = value
@@ -47,6 +48,9 @@ class BuildEmailViewModel @Inject constructor(
         shouldStartIntent.value = true
     }
 
+    fun purgeImageFiles() {
+        purgeImageFilesUseCase.purgeImageFiles()
+    }
 
     fun takePhoto(
         context: Context,

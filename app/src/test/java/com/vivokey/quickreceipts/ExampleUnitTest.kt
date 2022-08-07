@@ -1,4 +1,4 @@
-package com.vivokey.receiptmailer
+package com.vivokey.quickreceipts
 
 import org.junit.Test
 

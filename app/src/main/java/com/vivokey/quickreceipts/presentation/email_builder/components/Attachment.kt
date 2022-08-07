@@ -1,4 +1,4 @@
-package com.vivokey.receiptmailer.presentation.email_builder.components
+package com.vivokey.quickreceipts.presentation.email_builder.components
 
 import android.net.Uri
 import androidx.compose.foundation.Image

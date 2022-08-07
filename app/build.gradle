@@ -9,7 +9,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.vivokey.receiptmailer"
+        applicationId "com.vivokey.quickreceipts"
         minSdk 30
         targetSdk 32
         versionCode 1

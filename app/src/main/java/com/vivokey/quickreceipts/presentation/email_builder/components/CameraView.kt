@@ -1,4 +1,4 @@
-package com.vivokey.receiptmailer.presentation.email_builder.components
+package com.vivokey.quickreceipts.presentation.email_builder.components
 
 import android.content.Context
 import androidx.camera.core.CameraSelector
@@ -29,10 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.vivokey.receiptmailer.presentation.email_builder.BuildEmailViewModel
-import kotlinx.coroutines.DelicateCoroutinesApi
-import java.io.File
-import java.util.concurrent.Executor
+import com.vivokey.quickreceipts.presentation.email_builder.BuildEmailViewModel
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -67,7 +64,10 @@ fun CameraView(
         preview.setSurfaceProvider(previewView.surfaceProvider)
     }
 
-    Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.fillMaxSize()) {
+    Box(
+        contentAlignment = Alignment.BottomCenter,
+        modifier = modifier.fillMaxSize()
+    ) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
         
         IconButton(onClick = {

@@ -1,9 +1,9 @@
-package com.vivokey.receiptmailer.di
+package com.vivokey.quickreceipts.di
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Environment
-import com.vivokey.receiptmailer.R
+import com.vivokey.quickreceipts.R
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

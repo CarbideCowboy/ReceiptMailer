@@ -1,4 +1,4 @@
-package com.vivokey.receiptmailer.ui.theme
+package com.vivokey.quickreceipts.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
@@ -31,7 +31,7 @@ private val LightColorPalette = lightColors(
 
 
 @Composable
-fun ReceiptMailerTheme(
+fun QuickReceiptsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {

@@ -1,4 +1,4 @@
-package com.vivokey.receiptmailer.presentation
+package com.vivokey.quickreceipts.presentation
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -20,7 +20,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.sharp.Biotech
 import androidx.compose.material.icons.sharp.Clear
+import androidx.compose.material.icons.sharp.Delete
+import androidx.compose.material.icons.sharp.RestoreFromTrash
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,11 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
-import com.vivokey.receiptmailer.R
-import com.vivokey.receiptmailer.ui.theme.ReceiptMailerTheme
 import dagger.hilt.android.AndroidEntryPoint
-import com.vivokey.receiptmailer.presentation.email_builder.BuildEmailViewModel
-import com.vivokey.receiptmailer.presentation.email_builder.components.CameraView
+import com.vivokey.quickreceipts.presentation.email_builder.BuildEmailViewModel
+import com.vivokey.quickreceipts.presentation.email_builder.components.CameraView
+import com.vivokey.quickreceipts.ui.theme.QuickReceiptsTheme
+import com.vivokey.quickreceipts.R
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -62,7 +65,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val focusManager = LocalFocusManager.current
             val interactionSource = remember { MutableInteractionSource() }
-            ReceiptMailerTheme {
+            QuickReceiptsTheme {
                 Box {
                     Image(
                         modifier = Modifier
@@ -80,11 +83,44 @@ class MainActivity : ComponentActivity() {
                             },
                         backgroundColor = Color.Transparent,
                         floatingActionButton = {
-                            FloatingActionButton(onClick = {
-                                /*TODO*/
-                            }) {
+                            if(viewModel.showPurgeFileDialog.value) {
+                                AlertDialog(
+                                    title = {
+                                        Text("Confirm")
+                                    },
+                                    text = {
+                                        Text("Would you like to clear all previous receipt files from your device?")
+                                    },
+                                    onDismissRequest = {},
+                                    confirmButton = {
+                                        TextButton(
+                                            onClick = {
+                                                viewModel.purgeImageFiles()
+                                                viewModel.showPurgeFileDialog.value = false
+                                            }
+                                        ) {
+                                            Text("OK")
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(
+                                            onClick = {
+                                                viewModel.showPurgeFileDialog.value = false
+                                            }
+                                        ) {
+                                            Text("Cancel")
+                                        }
+                                    }
+                                )
+                            }
+                            FloatingActionButton(
+                                onClick = {
+                                viewModel.showPurgeFileDialog.value = true
+                                },
+                                backgroundColor = Color.Red
+                            ) {
                                 Icon(
-                                    imageVector = Icons.Sharp.Clear,
+                                    imageVector = Icons.Sharp.Delete,
                                     contentDescription = "Erase previous image files from device",
                                     tint = Color.White,
                                 )
@@ -250,7 +286,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun onSendEmailPressed() {
-
         if(viewModel.recipient.isNullOrEmpty()) {
             Toast.makeText(
                 this,

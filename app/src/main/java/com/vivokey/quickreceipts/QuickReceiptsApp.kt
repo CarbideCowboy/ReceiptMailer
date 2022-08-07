@@ -1,8 +1,8 @@
-package com.vivokey.receiptmailer
+package com.vivokey.quickreceipts
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class ReceiptMailerApp : Application() {
+class QuickReceiptsApp : Application() {
 }

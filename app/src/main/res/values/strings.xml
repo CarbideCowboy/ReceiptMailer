@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ReceiptMailer</string>
+    <string name="app_name">QuickReceipts</string>
     <string name="preference_recipient">PREFERENCE_RECIPIENT</string>
     <string name="preference_subject">PREFERENCE_SUBJECT</string>
     <string name="preference_body">PREFERENCE_BODY</string>
